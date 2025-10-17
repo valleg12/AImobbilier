@@ -28,8 +28,8 @@ class DustService {
   async callChefOrchestre(userMessage, conversationId = null, signal = null) {
     console.log('🚀 Appel à l\'agent Dust chef d\'orchestre:', userMessage);
 
-    // Structure API Dust DIRECTE (comme le test qui fonctionne)
-    const dustUrl = `https://eu.dust.tt/api/v1/w/${this.workspaceId}/assistant/conversations`;
+    // Structure API Dust avec proxy Netlify (version qui donnait 504)
+    const dustUrl = `/api/dust/v1/w/${this.workspaceId}/assistant/conversations`;
     
     try {
 
