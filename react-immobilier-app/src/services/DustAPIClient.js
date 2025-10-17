@@ -23,7 +23,12 @@ class DustServiceClient {
         },
         body: JSON.stringify({
           message: {
-            content: message
+            content: message,
+            mentions: [],
+            context: {
+              timezone: "Europe/Paris",
+              username: "client"
+            }
           },
           agent: {
             agent_id: this.agentId
