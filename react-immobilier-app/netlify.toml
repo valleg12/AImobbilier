@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/api/dust/*"
+  to = "https://eu.dust.tt/api/:splat"
+  status = 200
+  headers = {X-From = "Netlify"}
