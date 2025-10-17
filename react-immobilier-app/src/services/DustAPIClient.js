@@ -120,9 +120,9 @@ class DustServiceClient {
         }
         
         // Vérifier si on a trouvé une réponse différente du message utilisateur
-        if (responseMessage === message) {
-          console.log('❌ DustServiceClient - Message identique détecté, recherche alternative...');
-          responseMessage = "Je n'ai pas pu extraire la réponse de l'agent. Structure de réponse:\n" + JSON.stringify(result, null, 2).substring(0, 1000) + "...";
+        if (responseMessage === "Réponse reçue de l'agent Dust Client" || responseMessage === message) {
+          console.log('❌ DustServiceClient - Aucune réponse valide trouvée, affichage de la structure complète...');
+          responseMessage = "🔍 Structure de réponse Dust détectée mais parsing échoué. Voici la structure complète:\n\n" + JSON.stringify(result, null, 2);
         }
         
       } catch (parseError) {
