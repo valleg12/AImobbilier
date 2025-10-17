@@ -82,18 +82,33 @@ class DustService {
         ok: dustResponse.ok
       });
 
-      if (!dustResponse.ok) {
-        const errorText = await dustResponse.text();
-        console.error('❌ Erreur Dust API:', { 
-          status: dustResponse.status, 
-          statusText: dustResponse.statusText,
-          errorText,
-          headers: Object.fromEntries(dustResponse.headers.entries())
-        });
-        throw new Error(`Erreur Dust API: ${dustResponse.status} - ${errorText}`);
-      }
+            if (!dustResponse.ok) {
+              const errorText = await dustResponse.text();
+              console.error('❌ Erreur Dust API:', {
+                status: dustResponse.status,
+                statusText: dustResponse.statusText,
+                errorText,
+                headers: Object.fromEntries(dustResponse.headers.entries())
+              });
+              throw new Error(`Erreur Dust API: ${dustResponse.status} - ${errorText}`);
+            }
 
-      const result = await dustResponse.json();
+            // Vérifier si la réponse est vide
+            const responseText = await dustResponse.text();
+            console.log('📄 Réponse brute Dust:', responseText);
+            
+            if (!responseText || responseText.trim() === '') {
+              throw new Error('Réponse vide de l\'API Dust');
+            }
+            
+            let result;
+            try {
+              result = JSON.parse(responseText);
+            } catch (parseError) {
+              console.error('❌ Erreur parsing JSON:', parseError);
+              console.error('📄 Texte reçu:', responseText);
+              throw new Error(`Erreur parsing JSON: ${parseError.message}`);
+            }
       console.log('✅ Résultat Dust complet:', result);
 
       // Test direct - afficher la réponse brute pour debug

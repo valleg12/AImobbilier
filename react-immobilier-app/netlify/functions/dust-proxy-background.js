@@ -12,7 +12,7 @@ exports.handler = async (event, context) => {
 
   try {
     // Extraire le chemin de l'URL
-    const path = event.path.replace('/.netlify/functions/dust-proxy', '');
+    const path = event.path.replace('/.netlify/functions/dust-proxy-background', '');
     const dustUrl = `https://eu.dust.tt/api${path}`;
     
     console.log('Proxying request to:', dustUrl);
@@ -28,6 +28,20 @@ exports.handler = async (event, context) => {
     });
 
     const data = await response.text();
+    console.log('Dust API response status:', response.status);
+    console.log('Dust API response body:', data);
+    
+    // Vérifier si la réponse est valide
+    if (!data || data.trim() === '') {
+      return {
+        statusCode: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({ error: 'Empty response from Dust API' })
+      };
+    }
     
     return {
       statusCode: response.status,
