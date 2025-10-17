@@ -26,11 +26,12 @@ class DustService {
 
   // Méthode principale pour parler à l'agent chef d'orchestre
   async callChefOrchestre(userMessage, conversationId = null, signal = null) {
-    try {
-      console.log('🚀 Appel à l\'agent Dust chef d\'orchestre:', userMessage);
+    console.log('🚀 Appel à l\'agent Dust chef d\'orchestre:', userMessage);
 
-      // Structure API Dust correcte selon votre ami (URL directe)
-      const dustUrl = `https://eu.dust.tt/api/v1/w/${this.workspaceId}/assistant/conversations`;
+    // Structure API Dust avec proxy Netlify pour contourner CORS
+    const dustUrl = `/api/v1/w/${this.workspaceId}/assistant/conversations`;
+    
+    try {
 
       const dustPayload = {
         message: {
