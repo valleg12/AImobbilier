@@ -64,10 +64,6 @@ class DustService {
         agentId: this.agentId
       });
 
-      // Test direct avec timeout plus long (en attendant le déploiement des functions)
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 secondes
-      
       const dustResponse = await fetch(dustUrl, {
         method: 'POST',
         headers: {
@@ -75,11 +71,9 @@ class DustService {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(dustPayload),
-        signal: controller.signal,
+        signal,
         mode: 'cors'
       });
-      
-      clearTimeout(timeoutId);
 
       console.log('📡 Réponse Dust:', {
         status: dustResponse.status,
