@@ -57,7 +57,9 @@ class DustService {
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json'
-        }
+        },
+        workspaceId: this.workspaceId,
+        agentId: this.agentId
       });
 
       const dustResponse = await fetch(dustUrl, {
@@ -111,7 +113,15 @@ class DustService {
       };
 
     } catch (error) {
-      console.error('❌ Erreur Dust API:', error);
+      console.error('❌ Erreur Dust API détaillée:', {
+        error: error,
+        message: error.message,
+        name: error.name,
+        stack: error.stack,
+        url: dustUrl,
+        workspaceId: this.workspaceId,
+        agentId: this.agentId
+      });
       
       // Gestion spécifique des erreurs d'annulation
       if (error.name === 'AbortError') {
@@ -129,7 +139,13 @@ class DustService {
         message: `Erreur: ${error.message}`,
         agent_name: 'Chef d\'orchestre',
         timestamp: new Date().toISOString(),
-        error: error.message
+        error: error.message,
+        details: {
+          name: error.name,
+          workspaceId: this.workspaceId,
+          agentId: this.agentId,
+          url: dustUrl
+        }
       };
     }
   }
