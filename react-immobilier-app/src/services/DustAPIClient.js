@@ -68,19 +68,70 @@ class DustServiceClient {
       try {
         console.log('🔍 DustServiceClient - Structure complète result:', JSON.stringify(result, null, 2));
         
-        // Structure Dust: result.conversation.content[1][0].content
-        if (result.conversation && result.conversation.content && result.conversation.content[1] && result.conversation.content[1][0]) {
-          const agentMessage = result.conversation.content[1][0];
-          console.log('🔍 DustServiceClient - Agent message:', JSON.stringify(agentMessage, null, 2));
+        // Essayer toutes les structures possibles
+        if (result.conversation && result.conversation.content) {
+          console.log('🔍 DustServiceClient - Conversation content trouvé:', result.conversation.content);
           
-          if (agentMessage.content) {
-            responseMessage = agentMessage.content;
-          } else if (agentMessage.contents && agentMessage.contents[0] && agentMessage.contents[0].content) {
-            responseMessage = agentMessage.contents[0].content.value || agentMessage.contents[0].content;
-          } else if (agentMessage.contents && agentMessage.contents[0] && agentMessage.contents[0].text) {
-            responseMessage = agentMessage.contents[0].text;
+          // Structure 1: result.conversation.content[1][0].content
+          if (result.conversation.content[1] && result.conversation.content[1][0]) {
+            const agentMessage = result.conversation.content[1][0];
+            console.log('🔍 DustServiceClient - Agent message [1][0]:', JSON.stringify(agentMessage, null, 2));
+            
+            if (agentMessage.content) {
+              responseMessage = agentMessage.content;
+            } else if (agentMessage.contents && agentMessage.contents[0]) {
+              if (agentMessage.contents[0].content) {
+                responseMessage = agentMessage.contents[0].content.value || agentMessage.contents[0].content;
+              } else if (agentMessage.contents[0].text) {
+                responseMessage = agentMessage.contents[0].text;
+              }
+            }
+          }
+          
+          // Structure 2: result.conversation.content[0][0].content (premier message)
+          else if (result.conversation.content[0] && result.conversation.content[0][0]) {
+            const agentMessage = result.conversation.content[0][0];
+            console.log('🔍 DustServiceClient - Agent message [0][0]:', JSON.stringify(agentMessage, null, 2));
+            
+            if (agentMessage.content) {
+              responseMessage = agentMessage.content;
+            } else if (agentMessage.contents && agentMessage.contents[0]) {
+              if (agentMessage.contents[0].content) {
+                responseMessage = agentMessage.contents[0].content.value || agentMessage.contents[0].content;
+              } else if (agentMessage.contents[0].text) {
+                responseMessage = agentMessage.contents[0].text;
+              }
+            }
+          }
+          
+          // Structure 3: Parcourir tous les messages
+          else {
+            console.log('🔍 DustServiceClient - Parcours de tous les messages...');
+            for (let i = 0; i < result.conversation.content.length; i++) {
+              const messageGroup = result.conversation.content[i];
+              if (Array.isArray(messageGroup)) {
+                for (let j = 0; j < messageGroup.length; j++) {
+                  const msg = messageGroup[j];
+                  console.log(`🔍 DustServiceClient - Message [${i}][${j}]:`, JSON.stringify(msg, null, 2));
+                  
+                  if (msg.content && msg.content !== message) {
+                    responseMessage = msg.content;
+                    break;
+                  } else if (msg.contents && msg.contents[0]) {
+                    if (msg.contents[0].content && msg.contents[0].content !== message) {
+                      responseMessage = msg.contents[0].content.value || msg.contents[0].content;
+                      break;
+                    } else if (msg.contents[0].text && msg.contents[0].text !== message) {
+                      responseMessage = msg.contents[0].text;
+                      break;
+                    }
+                  }
+                }
+              }
+            }
           }
         }
+        
         // Fallback pour autres structures
         else if (result.message && result.message.content) {
           responseMessage = result.message.content;
@@ -97,6 +148,13 @@ class DustServiceClient {
           console.log('❌ DustServiceClient - Aucune structure reconnue, affichage du JSON complet');
           responseMessage = "Structure de réponse non reconnue. Réponse brute:\n" + JSON.stringify(result, null, 2).substring(0, 1000) + "...";
         }
+        
+        // Vérifier si on a trouvé une réponse différente du message utilisateur
+        if (responseMessage === message) {
+          console.log('❌ DustServiceClient - Message identique détecté, recherche alternative...');
+          responseMessage = "Je n'ai pas pu extraire la réponse de l'agent. Structure de réponse:\n" + JSON.stringify(result, null, 2).substring(0, 1000) + "...";
+        }
+        
       } catch (parseError) {
         console.error('❌ DustServiceClient - Erreur parsing réponse agent:', parseError);
         responseMessage = "Erreur lors de l'extraction de la réponse de l'agent client";
