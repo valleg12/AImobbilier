@@ -1,5 +1,6 @@
 import React from 'react';
 import { Sparkles, MapPin, Bed, Bath, Square, ArrowRight, Mail, Phone, Home, TrendingUp, Users } from 'lucide-react';
+import ClientChatbot from './ClientChatbot';
 
 const ClientView = () => {
   return (
@@ -7,11 +8,6 @@ const ClientView = () => {
       {/* Section Hero */}
       <section className="hero-section">
         <div className="hero-content">
-          <div className="badge">
-            <Sparkles className="w-4 h-4" />
-            Propulsé par l'Intelligence Artificielle
-          </div>
-          
           <h1>
             Trouvez Votre <span className="highlight">Propriété Idéale</span> avec Azura
           </h1>
@@ -47,25 +43,9 @@ const ClientView = () => {
           </div>
         </div>
         
-        {/* Assistant IA */}
-        <div className="chat-container">
-          <div className="chat-header">
-            <h3>Assistant IA Azura</h3>
-            <p>Posez vos questions, obtenez des réponses instantanées</p>
-          </div>
-          
-          <div className="chat-messages">
-            <div className="message assistant">
-              Bonjour ! Je suis votre assistant immobilier. Comment puis-je vous aider à trouver votre propriété idéale ?
-            </div>
-          </div>
-          
-          <div className="chat-input">
-            <input type="text" placeholder="Posez votre question..." />
-            <button>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
+        {/* Assistant IA Client */}
+        <div className="chat-container" style={{ height: '500px' }}>
+          <ClientChatbot />
         </div>
       </section>
 
