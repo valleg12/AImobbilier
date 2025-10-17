@@ -1,4 +1,4 @@
-// Configuration Dust API
+// Configuration Dust API - Version 2.0
 const DUST_CONFIG = {
   BASE_URL: "https://eu.dust.tt",
   WORKSPACE_ID: "Z1YDH1d9W9",
