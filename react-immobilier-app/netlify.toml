@@ -3,4 +3,4 @@
   publish = "build"
 
 [functions]
-  timeout = 30
+  timeout = 30# Force update
