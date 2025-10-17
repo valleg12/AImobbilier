@@ -28,8 +28,8 @@ class DustService {
   async callChefOrchestre(userMessage, conversationId = null, signal = null) {
     console.log('🚀 Appel à l\'agent Dust chef d\'orchestre:', userMessage);
 
-    // Structure API Dust DIRECTE (comme le test qui fonctionne)
-    const dustUrl = `https://eu.dust.tt/api/v1/w/${this.workspaceId}/assistant/conversations`;
+    // Structure API Dust avec proxy CORS (allorigins.win)
+    const dustUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://eu.dust.tt/api/v1/w/${this.workspaceId}/assistant/conversations`)}`;
     
     try {
 
@@ -75,8 +75,7 @@ class DustService {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(dustPayload),
-        signal: controller.signal,
-        mode: 'cors'
+        signal: controller.signal
       });
       
       clearTimeout(timeoutId);
