@@ -29,8 +29,8 @@ class DustService {
     try {
       console.log('🚀 Appel à l\'agent Dust chef d\'orchestre:', userMessage);
 
-      // Structure API Dust correcte selon votre ami (avec proxy)
-      const dustUrl = `/api/v1/w/${this.workspaceId}/assistant/conversations`;
+      // Structure API Dust correcte selon votre ami (URL directe)
+      const dustUrl = `https://eu.dust.tt/api/v1/w/${this.workspaceId}/assistant/conversations`;
 
       const dustPayload = {
         message: {
