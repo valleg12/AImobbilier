@@ -1,57 +1,50 @@
 exports.handler = async (event, context) => {
-  // CORS headers
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  };
-
-  // Handle preflight requests
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: '',
-    };
-  }
-
+  // Vérifier que c'est une requête POST
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method not allowed' }),
+      body: JSON.stringify({ error: 'Method not allowed' })
     };
   }
 
   try {
-    const payload = JSON.parse(event.body);
+    // Extraire le chemin de l'URL
+    const path = event.path.replace('/.netlify/functions/dust-proxy', '');
+    const dustUrl = `https://eu.dust.tt/api${path}`;
     
-    // Appel direct à l'API Dust (comme le test qui fonctionne)
-    const dustResponse = await fetch('https://eu.dust.tt/api/v1/w/Z1YDH1d9W9/assistant/conversations', {
+    console.log('Proxying request to:', dustUrl);
+    
+    // Faire la requête vers l'API Dust
+    const response = await fetch(dustUrl, {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer sk-4a669dc7f20ff258b484bb4531960d73',
-        'Content-Type': 'application/json',
+        'Authorization': event.headers.authorization,
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(payload),
+      body: event.body
     });
 
-    const result = await dustResponse.json();
-
+    const data = await response.text();
+    
     return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify(result),
+      statusCode: response.status,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+      },
+      body: data
     };
   } catch (error) {
     console.error('Proxy error:', error);
     return {
       statusCode: 500,
-      headers,
-      body: JSON.stringify({ 
-        error: error.message,
-        success: false 
-      }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ error: error.message })
     };
   }
 };
