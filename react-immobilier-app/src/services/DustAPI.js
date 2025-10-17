@@ -4,7 +4,7 @@ const DUST_CONFIG = {
   WORKSPACE_ID: "Z1YDH1d9W9",
   SPACE_ID: "vlt_Q8Ac42WRzqySfEMmrhHA",
   API_KEY: "sk-4a669dc7f20ff258b484bb4531960d73",
-  AGENT_ID: "AlJDCE6I8v"
+  AGENT_ID: "e88YXuqQEC"
 };
 
 class DustService {
