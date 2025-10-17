@@ -29,7 +29,7 @@ class DustService {
     console.log('🚀 Appel à l\'agent Dust chef d\'orchestre:', userMessage);
 
     // Structure API Dust avec proxy Netlify (version qui donnait 504)
-    const dustUrl = `/api/dust/v1/w/${this.workspaceId}/assistant/conversations`;
+    const dustUrl = `https://eu.dust.tt/api/v1/w/${this.workspaceId}/assistant/conversations`;
     
     try {
 
@@ -64,6 +64,10 @@ class DustService {
         agentId: this.agentId
       });
 
+      // Test direct avec timeout plus long (en attendant le déploiement des functions)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 secondes
+      
       const dustResponse = await fetch(dustUrl, {
         method: 'POST',
         headers: {
@@ -71,9 +75,11 @@ class DustService {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(dustPayload),
-        signal,
+        signal: controller.signal,
         mode: 'cors'
       });
+      
+      clearTimeout(timeoutId);
 
       console.log('📡 Réponse Dust:', {
         status: dustResponse.status,
