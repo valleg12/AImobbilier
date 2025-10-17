@@ -92,21 +92,16 @@ class DustService {
       }
 
       const result = await dustResponse.json();
-      console.log('✅ Résultat Dust:', result);
+      console.log('✅ Résultat Dust complet:', result);
 
-      // Extraire la réponse de l'agent
-      let answer = "";
-      if (result.message && result.message.content) {
-        answer = result.message.content;
-      } else if (result.content) {
-        answer = result.content;
-      } else {
-        answer = JSON.stringify(result);
-      }
-
+      // Version ultra-simple - test direct
+      const responseMessage = result.message?.content || result.content || "Réponse reçue de l'agent Dust";
+      
+      console.log('📤 Message final envoyé:', responseMessage);
+      
       return {
         success: true,
-        message: answer,
+        message: responseMessage,
         agent_name: 'Chef d\'orchestre',
         timestamp: new Date().toISOString(),
         conversation_id: result.conversationId || null,
