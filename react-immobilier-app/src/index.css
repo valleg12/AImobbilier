@@ -7,28 +7,28 @@
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  background-color: var(--background-dark);
-  color: var(--text-light);
+  background-color: var(--background-light);
+  color: var(--text-dark);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Variables CSS pour la palette écru foncée */
+/* Variables CSS pour la palette écru de base */
 :root {
   --primary-ecru: #f5f5dc;
-  --secondary-ecru: #e8e4d8;
-  --accent-ecru: #d4cfc4;
-  --background-dark: #2a2823;
-  --background-medium: #3a372f;
-  --background-light: #4a463b;
-  --text-light: #f5f5dc;
-  --text-medium: #e8e4d8;
-  --text-muted: #d4cfc4;
-  --border-ecru: #6b6658;
-  --shadow-ecru: rgba(42, 40, 35, 0.5);
-  --gradient-ecru: linear-gradient(135deg, #2a2823 0%, #3a372f 100%);
-  --hover-ecru: #4a463b;
+  --secondary-ecru: #f0f0e6;
+  --accent-ecru: #e8e4d8;
+  --background-light: #fafafa;
+  --background-medium: #f5f5f0;
+  --background-dark: #f0f0e6;
+  --text-dark: #2a2823;
+  --text-medium: #4a463b;
+  --text-muted: #6b6658;
+  --border-ecru: #d4cfc4;
+  --shadow-ecru: rgba(42, 40, 35, 0.1);
+  --gradient-ecru: linear-gradient(135deg, #fafafa 0%, #f0f0e6 100%);
+  --hover-ecru: #e8e4d8;
 }
 
 @keyframes blink {
@@ -44,7 +44,7 @@ body {
 
 /* Navigation */
 .navbar {
-  background: rgba(42, 40, 35, 0.95);
+  background: rgba(245, 245, 220, 0.95);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-ecru);
   padding: 1rem 2rem;
@@ -64,7 +64,7 @@ body {
 .logo {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text-light);
+  color: var(--text-dark);
   text-decoration: none;
 }
 
@@ -83,7 +83,7 @@ body {
 
 .nav-links a:hover,
 .nav-links a.active {
-  color: var(--text-light);
+  color: var(--text-dark);
 }
 
 /* Contenu principal */
@@ -95,7 +95,7 @@ body {
 
 /* Cartes et composants */
 .card {
-  background: rgba(58, 55, 47, 0.8);
+  background: rgba(245, 245, 220, 0.8);
   border: 1px solid var(--border-ecru);
   border-radius: 12px;
   padding: 1.5rem;
