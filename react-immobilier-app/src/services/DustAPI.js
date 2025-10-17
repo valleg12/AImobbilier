@@ -28,8 +28,8 @@ class DustService {
   async callChefOrchestre(userMessage, conversationId = null, signal = null) {
     console.log('🚀 Appel à l\'agent Dust chef d\'orchestre:', userMessage);
 
-    // Structure API Dust avec fonction Netlify (sans CORS)
-    const dustUrl = `/.netlify/functions/dust-proxy/v1/w/${this.workspaceId}/assistant/conversations`;
+    // Structure API Dust avec fonction Netlify Background (sans CORS)
+    const dustUrl = `/.netlify/functions/dust-proxy-background/v1/w/${this.workspaceId}/assistant/conversations`;
     
     try {
 
