@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, Send, Bot, User, Trash2, Copy, Download } from 'lucide-react';
+import React, { useState } from 'react';
+import { Send, Download, Trash2 } from 'lucide-react';
 import DustAPI from '../services/DustAPI';
 
 const Assistant = () => {
@@ -7,41 +7,28 @@ const Assistant = () => {
     {
       id: 1,
       type: 'bot',
-      content: 'Bonjour ! Je suis votre assistant IA chef d\'orchestre spécialisé dans l\'immobilier. Je peux analyser vos biens, évaluer leur potentiel, optimiser vos investissements et vous accompagner dans vos projets. Comment puis-je vous aider aujourd\'hui ?',
+      content: 'Bonjour ! Je suis votre assistant IA Azura. Comment puis-je vous aider avec vos questions immobilières ?',
       timestamp: new Date()
     }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [streamingMessage, setStreamingMessage] = useState('');
   const [abortController, setAbortController] = useState(null);
-  const messagesEndRef = useRef(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
 
+    const currentMessage = inputMessage;
+    setInputMessage('');
     const userMessage = {
       id: Date.now(),
       type: 'user',
-      content: inputMessage,
+      content: currentMessage,
       timestamp: new Date()
     };
-
     setMessages(prev => [...prev, userMessage]);
-    const currentMessage = inputMessage;
-    setInputMessage('');
     setIsLoading(true);
-    setStreamingMessage('');
 
-    // Créer un AbortController pour pouvoir annuler la requête
     const controller = new AbortController();
     setAbortController(controller);
 
@@ -109,7 +96,7 @@ const Assistant = () => {
         stack: error.stack,
         cause: error.cause
       }, null, 2)}`;
-      
+
       setMessages(prev => prev.map(msg => 
         msg.id === botMessageId 
           ? { ...msg, content: errorMessage, streaming: false }
@@ -117,11 +104,9 @@ const Assistant = () => {
       ));
     } finally {
       setIsLoading(false);
-      setStreamingMessage('');
       setAbortController(null);
     }
   };
-
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -146,318 +131,173 @@ const Assistant = () => {
     ]);
   };
 
-  const stopGeneration = () => {
-    if (abortController) {
-      abortController.abort();
-      setAbortController(null);
-      setIsLoading(false);
-      setStreamingMessage('');
-    }
-  };
+  const exportToPDF = () => {
+    // Créer le contenu HTML pour le PDF
+    const chatContent = messages.map(msg => 
+      `<div style="margin-bottom: 1rem; padding: 0.75rem; border-radius: 8px; ${msg.type === 'user' ? 'background: #f0f0f0; text-align: right;' : 'background: #e8f4f8; text-align: left;'}">
+        <strong>${msg.type === 'user' ? 'Vous' : 'Assistant Azura'}:</strong><br>
+        ${msg.content.replace(/\n/g, '<br>')}
+        <div style="font-size: 0.8em; color: #666; margin-top: 0.5rem;">
+          ${msg.timestamp.toLocaleString()}
+        </div>
+      </div>`
+    ).join('');
 
-  const copyMessage = (content) => {
-    navigator.clipboard.writeText(content);
-  };
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Conversation Azura - ${new Date().toLocaleDateString()}</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h1 { color: #2c3e50; text-align: center; }
+            .header { text-align: center; margin-bottom: 2rem; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Conversation avec Assistant IA Azura</h1>
+            <p>Exporté le ${new Date().toLocaleString()}</p>
+          </div>
+          ${chatContent}
+        </body>
+      </html>
+    `;
 
-  const exportChat = () => {
-    const chatText = messages.map(msg => 
-      `${msg.type === 'user' ? 'Vous' : 'Assistant'}: ${msg.content}\n`
-    ).join('\n');
-    
-    const blob = new Blob([chatText], { type: 'text/plain' });
+    // Créer et télécharger le PDF
+    const blob = new Blob([htmlContent], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `chat-assistant-${new Date().toISOString().split('T')[0]}.txt`;
+    a.download = `conversation-azura-${new Date().toISOString().split('T')[0]}.html`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
-  const quickQuestions = [
-    'Test de connexion API',
-    'Bonjour, comment ça va ?',
-    'Que peux-tu faire pour moi ?'
-  ];
-
-  const testConnection = async () => {
-    setIsLoading(true);
-    try {
-      const result = await DustAPI.testConnection();
-      
-      const testMessage = {
-        id: Date.now(),
-        type: 'bot',
-        content: result.message,
-        timestamp: new Date()
-      };
-      
-      setMessages(prev => [...prev, testMessage]);
-    } catch (error) {
-      console.error('Erreur test connexion:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
-    <div className="fade-in">
-      <div className="card" style={{ marginBottom: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-          <div style={{ 
-            width: '48px', 
-            height: '48px', 
-            background: 'var(--primary-ecru)', 
-            borderRadius: '50%', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            border: '2px solid var(--border-ecru)'
-          }}>
-            <MessageCircle size={24} color="var(--text-dark)" />
-          </div>
-          <div>
-            <h1 style={{ margin: 0, color: 'var(--text-dark)' }}>
-              Assistant IA Spécialisé
-            </h1>
-            <p style={{ margin: 0, color: 'var(--text-medium)' }}>
-              Chatbot intelligent pour vous guider dans vos analyses immobilières
-            </p>
-          </div>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      {/* En-tête avec bouton d'export */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', padding: '0 1rem' }}>
+        <h3 style={{ margin: 0, color: 'var(--foreground)' }}>
+          Conversation
+        </h3>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button 
+            onClick={exportToPDF}
+            className="btn btn-outline" 
+            style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+            title="Exporter en PDF"
+          >
+            <Download className="w-4 h-4 mr-1" />
+            Export PDF
+          </button>
+          <button 
+            onClick={clearChat}
+            className="btn btn-outline" 
+            style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+            title="Effacer la conversation"
+          >
+            <Trash2 className="w-4 h-4 mr-1" />
+            Effacer
+          </button>
         </div>
       </div>
 
-      <div className="grid-2">
-        {/* Zone de chat */}
-        <div className="card" style={{ height: '600px', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h3 style={{ margin: 0, color: 'var(--text-dark)' }}>
-              Conversation
-            </h3>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <button 
-                onClick={testConnection}
-                className="btn" 
-                style={{ padding: '0.5rem', background: 'var(--primary-ecru)', color: 'var(--text-dark)' }}
-                title="Tester la connexion API"
-                disabled={isLoading}
-              >
-                🔗
-              </button>
-              <button 
-                onClick={exportChat}
-                className="btn btn-secondary" 
-                style={{ padding: '0.5rem' }}
-                title="Exporter la conversation"
-              >
-                <Download size={16} />
-              </button>
-              <button 
-                onClick={clearChat}
-                className="btn btn-secondary" 
-                style={{ padding: '0.5rem' }}
-                title="Effacer la conversation"
-              >
-                <Trash2 size={16} />
-              </button>
-            </div>
-          </div>
-
-          {/* Messages */}
-          <div style={{ 
-            flex: 1, 
-            overflowY: 'auto', 
-            padding: '1rem', 
-            background: 'var(--accent-ecru)', 
-            borderRadius: '8px',
-            marginBottom: '1rem'
+      {/* Zone de messages */}
+      <div style={{ 
+        flex: 1, 
+        overflowY: 'auto', 
+        padding: '1rem',
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: '1rem'
+      }}>
+        {messages.map((message) => (
+          <div key={message.id} style={{ 
+            display: 'flex', 
+            justifyContent: message.type === 'user' ? 'flex-end' : 'flex-start'
           }}>
-            {messages.map((message) => (
-              <div key={message.id} style={{ 
-                display: 'flex', 
-                justifyContent: message.type === 'user' ? 'flex-end' : 'flex-start',
-                marginBottom: '1rem'
+            <div style={{ 
+              maxWidth: '80%', 
+              padding: '0.75rem 1rem',
+              borderRadius: '12px',
+              background: message.type === 'user' 
+                ? 'linear-gradient(135deg, var(--primary), var(--accent))'
+                : 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid var(--border)',
+              color: message.type === 'user' ? 'white' : 'var(--foreground)',
+              wordWrap: 'break-word'
+            }}>
+              <div style={{ whiteSpace: 'pre-wrap' }}>
+                {message.content}
+              </div>
+              <div style={{ 
+                fontSize: '0.75rem', 
+                opacity: 0.7, 
+                marginTop: '0.5rem',
+                textAlign: 'right'
               }}>
-                <div style={{ 
-                  maxWidth: '80%', 
-                  display: 'flex', 
-                  gap: '0.5rem',
-                  flexDirection: message.type === 'user' ? 'row-reverse' : 'row'
-                }}>
-                  <div style={{ 
-                    width: '32px', 
-                    height: '32px', 
-                    background: message.type === 'user' ? 'var(--text-dark)' : 'var(--primary-ecru)', 
-                    borderRadius: '50%', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    flexShrink: 0
-                  }}>
-                    {message.type === 'user' ? (
-                      <User size={16} color="white" />
-                    ) : (
-                      <Bot size={16} color="var(--text-dark)" />
-                    )}
-                  </div>
-                  
-                  <div style={{ 
-                    background: message.type === 'user' ? 'var(--text-dark)' : 'white', 
-                    color: message.type === 'user' ? 'white' : 'var(--text-dark)',
-                    padding: '0.75rem 1rem', 
-                    borderRadius: '12px',
-                    border: '1px solid var(--border-ecru)',
-                    position: 'relative'
-                  }}>
-                    <div style={{ 
-                      whiteSpace: 'pre-wrap', 
-                      fontSize: '0.9rem',
-                      lineHeight: '1.5'
-                    }}>
-                      {message.content}
-                    </div>
-                    
-                    {message.type === 'bot' && (
-                      <button
-                        onClick={() => copyMessage(message.content)}
-                        style={{
-                          position: 'absolute',
-                          top: '0.5rem',
-                          right: '0.5rem',
-                          background: 'none',
-                          border: 'none',
-                          cursor: 'pointer',
-                          color: 'var(--text-medium)',
-                          padding: '0.25rem'
-                        }}
-                        title="Copier le message"
-                      >
-                        <Copy size={12} />
-                      </button>
-                    )}
-                    
-                    <div style={{ 
-                      fontSize: '0.75rem', 
-                      color: message.type === 'user' ? 'rgba(255,255,255,0.7)' : 'var(--text-light)',
-                      marginTop: '0.5rem'
-                    }}>
-                      {message.timestamp.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                    </div>
-                  </div>
-                </div>
+                {message.timestamp.toLocaleTimeString()}
               </div>
-            ))}
-            
-            {isLoading && (
-              <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: '1rem' }}>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <div style={{ 
-                    width: '32px', 
-                    height: '32px', 
-                    background: 'var(--primary-ecru)', 
-                    borderRadius: '50%', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center'
-                  }}>
-                    <Bot size={16} color="var(--text-dark)" />
-                  </div>
-                  <div style={{ 
-                    background: 'white', 
-                    padding: '0.75rem 1rem', 
-                    borderRadius: '12px',
-                    border: '1px solid var(--border-ecru)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem'
-                  }}>
-                    <div className="spinner"></div>
-                    <span style={{ fontSize: '0.9rem', color: 'var(--text-medium)' }}>
-                      Assistant réfléchit...
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Input */}
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <textarea
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Posez votre question à l'assistant IA..."
-              style={{
-                flex: 1,
-                padding: '0.75rem',
-                border: '1px solid var(--border-ecru)',
-                borderRadius: '8px',
-                background: 'white',
-                resize: 'vertical',
-                minHeight: '44px',
-                maxHeight: '120px',
-                fontFamily: 'inherit'
-              }}
-            />
-            <button
-              onClick={handleSendMessage}
-              disabled={!inputMessage.trim() || isLoading}
-              className="btn btn-primary"
-              style={{ padding: '0.75rem' }}
-            >
-              <Send size={16} />
-            </button>
-          </div>
-        </div>
-
-        {/* Questions rapides et aide */}
-        <div>
-          <div className="card" style={{ marginBottom: '2rem' }}>
-            <h3 style={{ marginBottom: '1rem', color: 'var(--text-dark)' }}>
-              Questions rapides
-            </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {quickQuestions.map((question, index) => (
-                <button
-                  key={index}
-                  onClick={() => setInputMessage(question)}
-                  className="btn btn-secondary"
-                  style={{ 
-                    textAlign: 'left', 
-                    justifyContent: 'flex-start',
-                    fontSize: '0.9rem',
-                    padding: '0.75rem 1rem'
-                  }}
-                >
-                  {question}
-                </button>
-              ))}
             </div>
           </div>
-
-          <div className="card" style={{ background: 'var(--accent-ecru)' }}>
-            <h3 style={{ marginBottom: '1rem', color: 'var(--text-dark)' }}>
-              💡 Comment utiliser l'assistant
-            </h3>
-            <div style={{ color: 'var(--text-medium)', fontSize: '0.9rem' }}>
-              <p style={{ marginBottom: '1rem' }}>
-                <strong>L'assistant IA peut vous aider à :</strong>
-              </p>
-              <ul style={{ paddingLeft: '1rem' }}>
-                <li>Choisir les bons agents pour vos analyses</li>
-                <li>Interpréter les résultats d'évaluation</li>
-                <li>Optimiser vos stratégies d'investissement</li>
-                <li>Répondre à vos questions techniques</li>
-                <li>Guider vos clients dans leurs choix</li>
-              </ul>
-              
-              <p style={{ marginTop: '1rem', fontStyle: 'italic' }}>
-                Posez des questions précises pour obtenir les meilleures réponses !
-              </p>
-            </div>
+        ))}
+        
+        {isLoading && (
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            gap: '0.5rem',
+            color: 'var(--foreground)',
+            opacity: 0.7
+          }}>
+            <div className="spinner"></div>
+            <span>Assistant Azura réfléchit...</span>
           </div>
+        )}
+      </div>
+
+      {/* Zone de saisie */}
+      <div style={{ 
+        padding: '1rem',
+        borderTop: '1px solid var(--border)',
+        background: 'rgba(255, 255, 255, 0.05)'
+      }}>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <input
+            type="text"
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Tapez votre message..."
+            disabled={isLoading}
+            style={{
+              flex: 1,
+              padding: '0.75rem',
+              border: '1px solid var(--border)',
+              borderRadius: '8px',
+              background: 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(16px)',
+              color: 'var(--foreground)',
+              fontSize: '0.875rem'
+            }}
+          />
+          <button
+            onClick={handleSendMessage}
+            disabled={isLoading || !inputMessage.trim()}
+            className="btn btn-primary"
+            style={{ 
+              padding: '0.75rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Send className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </div>
