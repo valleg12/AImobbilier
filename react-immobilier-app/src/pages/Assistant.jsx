@@ -58,30 +58,48 @@ const Assistant = () => {
 
     try {
       // Appel à l'agent Dust avec streaming
+      console.log('🚀 Début appel Dust API pour:', currentMessage);
       const dustResponse = await DustAPI.callChefOrchestre(currentMessage, controller.signal);
+      console.log('📥 Réponse Dust API complète:', dustResponse);
       
       if (dustResponse.success) {
         // Finaliser le message avec la réponse complète
+        console.log('✅ Succès - Message à afficher:', dustResponse.message);
         setMessages(prev => prev.map(msg => 
           msg.id === botMessageId 
             ? { ...msg, content: dustResponse.message, streaming: false }
             : msg
         ));
       } else {
-        // Message d'erreur
+        // Message d'erreur avec logs complets
+        console.log('❌ Erreur - Réponse complète:', dustResponse);
+        const errorMessage = `❌ Erreur Dust API: ${dustResponse.message}\n\n🔍 Logs complets:\n${JSON.stringify(dustResponse, null, 2)}`;
         setMessages(prev => prev.map(msg => 
           msg.id === botMessageId 
-            ? { ...msg, content: dustResponse.message, streaming: false }
+            ? { ...msg, content: errorMessage, streaming: false }
             : msg
         ));
       }
     } catch (error) {
-      console.error('Erreur lors de l\'appel Dust:', error);
+      console.error('🚨 Erreur lors de l\'appel Dust:', error);
+      console.error('🔍 Détails complets de l\'erreur:', {
+        message: error.message,
+        name: error.name,
+        stack: error.stack,
+        cause: error.cause
+      });
       
-      // Message d'erreur
+      // Message d'erreur avec logs complets
+      const errorMessage = `🚨 Erreur lors de l'appel Dust: ${error.message}\n\n🔍 Détails complets:\n${JSON.stringify({
+        message: error.message,
+        name: error.name,
+        stack: error.stack,
+        cause: error.cause
+      }, null, 2)}`;
+      
       setMessages(prev => prev.map(msg => 
         msg.id === botMessageId 
-          ? { ...msg, content: `Erreur: ${error.message}`, streaming: false }
+          ? { ...msg, content: errorMessage, streaming: false }
           : msg
       ));
     } finally {
