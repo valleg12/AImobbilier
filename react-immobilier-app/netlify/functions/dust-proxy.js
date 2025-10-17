@@ -12,7 +12,7 @@ exports.handler = async (event, context) => {
 
   try {
     // Extraire le chemin de l'URL
-    const path = event.path.replace('/.netlify/functions/dust-proxy-background', '');
+    const path = event.path.replace('/.netlify/functions/dust-proxy', '');
     const dustUrl = `https://eu.dust.tt/api${path}`;
     
     console.log('Proxying request to:', dustUrl);
