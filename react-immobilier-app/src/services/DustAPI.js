@@ -67,7 +67,8 @@ class DustService {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(dustPayload),
-        signal
+        signal,
+        mode: 'cors'
       });
 
       console.log('📡 Réponse Dust:', {
