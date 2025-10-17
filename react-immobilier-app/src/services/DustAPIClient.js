@@ -72,59 +72,29 @@ class DustServiceClient {
         if (result.conversation && result.conversation.content) {
           console.log('🔍 DustServiceClient - Conversation content trouvé:', result.conversation.content);
           
-          // Structure 1: result.conversation.content[1][0].content
-          if (result.conversation.content[1] && result.conversation.content[1][0]) {
-            const agentMessage = result.conversation.content[1][0];
-            console.log('🔍 DustServiceClient - Agent message [1][0]:', JSON.stringify(agentMessage, null, 2));
-            
-            if (agentMessage.content) {
-              responseMessage = agentMessage.content;
-            } else if (agentMessage.contents && agentMessage.contents[0]) {
-              if (agentMessage.contents[0].content) {
-                responseMessage = agentMessage.contents[0].content.value || agentMessage.contents[0].content;
-              } else if (agentMessage.contents[0].text) {
-                responseMessage = agentMessage.contents[0].text;
-              }
-            }
-          }
-          
-          // Structure 2: result.conversation.content[0][0].content (premier message)
-          else if (result.conversation.content[0] && result.conversation.content[0][0]) {
-            const agentMessage = result.conversation.content[0][0];
-            console.log('🔍 DustServiceClient - Agent message [0][0]:', JSON.stringify(agentMessage, null, 2));
-            
-            if (agentMessage.content) {
-              responseMessage = agentMessage.content;
-            } else if (agentMessage.contents && agentMessage.contents[0]) {
-              if (agentMessage.contents[0].content) {
-                responseMessage = agentMessage.contents[0].content.value || agentMessage.contents[0].content;
-              } else if (agentMessage.contents[0].text) {
-                responseMessage = agentMessage.contents[0].text;
-              }
-            }
-          }
-          
-          // Structure 3: Parcourir tous les messages
-          else {
-            console.log('🔍 DustServiceClient - Parcours de tous les messages...');
-            for (let i = 0; i < result.conversation.content.length; i++) {
-              const messageGroup = result.conversation.content[i];
-              if (Array.isArray(messageGroup)) {
-                for (let j = 0; j < messageGroup.length; j++) {
-                  const msg = messageGroup[j];
-                  console.log(`🔍 DustServiceClient - Message [${i}][${j}]:`, JSON.stringify(msg, null, 2));
-                  
-                  if (msg.content && msg.content !== message) {
-                    responseMessage = msg.content;
+          // Parcourir tous les messages pour trouver la réponse de l'agent
+          console.log('🔍 DustServiceClient - Parcours de tous les messages...');
+          for (let i = 0; i < result.conversation.content.length; i++) {
+            const messageGroup = result.conversation.content[i];
+            if (Array.isArray(messageGroup)) {
+              for (let j = 0; j < messageGroup.length; j++) {
+                const msg = messageGroup[j];
+                console.log(`🔍 DustServiceClient - Message [${i}][${j}]:`, JSON.stringify(msg, null, 2));
+                
+                // Chercher un message de type "assistant_message" ou avec un contenu différent du message utilisateur
+                if (msg.type === "assistant_message" || (msg.content && msg.content !== message && msg.content.trim() !== "")) {
+                  console.log(`✅ DustServiceClient - Message agent trouvé [${i}][${j}]:`, msg.content);
+                  responseMessage = msg.content;
+                  break;
+                } else if (msg.contents && msg.contents[0]) {
+                  if (msg.contents[0].content && msg.contents[0].content !== message && msg.contents[0].content.trim() !== "") {
+                    console.log(`✅ DustServiceClient - Message agent trouvé dans contents [${i}][${j}]:`, msg.contents[0].content);
+                    responseMessage = msg.contents[0].content.value || msg.contents[0].content;
                     break;
-                  } else if (msg.contents && msg.contents[0]) {
-                    if (msg.contents[0].content && msg.contents[0].content !== message) {
-                      responseMessage = msg.contents[0].content.value || msg.contents[0].content;
-                      break;
-                    } else if (msg.contents[0].text && msg.contents[0].text !== message) {
-                      responseMessage = msg.contents[0].text;
-                      break;
-                    }
+                  } else if (msg.contents[0].text && msg.contents[0].text !== message && msg.contents[0].text.trim() !== "") {
+                    console.log(`✅ DustServiceClient - Message agent trouvé dans text [${i}][${j}]:`, msg.contents[0].text);
+                    responseMessage = msg.contents[0].text;
+                    break;
                   }
                 }
               }
