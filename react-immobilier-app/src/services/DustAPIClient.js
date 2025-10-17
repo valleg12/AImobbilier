@@ -66,13 +66,19 @@ class DustServiceClient {
       let responseMessage = "Réponse reçue de l'agent Dust Client";
 
       try {
+        console.log('🔍 DustServiceClient - Structure complète result:', JSON.stringify(result, null, 2));
+        
         // Structure Dust: result.conversation.content[1][0].content
         if (result.conversation && result.conversation.content && result.conversation.content[1] && result.conversation.content[1][0]) {
           const agentMessage = result.conversation.content[1][0];
+          console.log('🔍 DustServiceClient - Agent message:', JSON.stringify(agentMessage, null, 2));
+          
           if (agentMessage.content) {
             responseMessage = agentMessage.content;
           } else if (agentMessage.contents && agentMessage.contents[0] && agentMessage.contents[0].content) {
             responseMessage = agentMessage.contents[0].content.value || agentMessage.contents[0].content;
+          } else if (agentMessage.contents && agentMessage.contents[0] && agentMessage.contents[0].text) {
+            responseMessage = agentMessage.contents[0].text;
           }
         }
         // Fallback pour autres structures
@@ -82,9 +88,14 @@ class DustServiceClient {
           responseMessage = result.content;
         } else if (result.text) {
           responseMessage = result.text;
+        } else if (result.assistant_message && result.assistant_message.content) {
+          responseMessage = result.assistant_message.content;
+        } else if (result.response && result.response.content) {
+          responseMessage = result.response.content;
         } else {
           // Si on ne trouve rien, on affiche les premières lignes du JSON
-          responseMessage = JSON.stringify(result).substring(0, 500) + "...";
+          console.log('❌ DustServiceClient - Aucune structure reconnue, affichage du JSON complet');
+          responseMessage = "Structure de réponse non reconnue. Réponse brute:\n" + JSON.stringify(result, null, 2).substring(0, 1000) + "...";
         }
       } catch (parseError) {
         console.error('❌ DustServiceClient - Erreur parsing réponse agent:', parseError);
