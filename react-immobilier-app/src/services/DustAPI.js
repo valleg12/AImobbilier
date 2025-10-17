@@ -71,8 +71,9 @@ class DustService {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(dustPayload),
-        signal
-        // Pas de mode: 'cors' - on utilise l'API directe comme le test qui fonctionne
+        signal,
+        // Timeout de 60 secondes pour les requêtes longues
+        timeout: 60000
       });
 
       console.log('📡 Réponse Dust:', {

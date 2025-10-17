@@ -1,4 +1,7 @@
 exports.handler = async (event, context) => {
+  // Augmenter le timeout à 30 secondes
+  context.callbackWaitsForEmptyEventLoop = false;
+  
   // Vérifier que c'est une requête POST
   if (event.httpMethod !== 'POST') {
     return {
