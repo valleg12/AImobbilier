@@ -50,7 +50,7 @@ const Assistant = () => {
     const botMessage = {
       id: botMessageId,
       type: 'bot',
-      content: '',
+      content: '🤖 MonConseillerImmo réfléchit... Cela peut prendre 30 secondes pour les analyses complexes.',
       timestamp: new Date(),
       streaming: true
     };
