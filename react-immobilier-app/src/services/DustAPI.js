@@ -94,10 +94,22 @@ class DustService {
       const result = await dustResponse.json();
       console.log('✅ Résultat Dust complet:', result);
 
-      // Version ultra-simple - test direct
-      const responseMessage = result.message?.content || result.content || "Réponse reçue de l'agent Dust";
+      // Test direct - afficher la réponse brute pour debug
+      let responseMessage = "Réponse reçue de l'agent Dust";
+      
+      if (result.message && result.message.content) {
+        responseMessage = result.message.content;
+      } else if (result.content) {
+        responseMessage = result.content;
+      } else if (result.text) {
+        responseMessage = result.text;
+      } else {
+        // Si on ne trouve rien, on affiche les premières lignes du JSON
+        responseMessage = JSON.stringify(result).substring(0, 500) + "...";
+      }
       
       console.log('📤 Message final envoyé:', responseMessage);
+      console.log('📊 Structure complète result:', result);
       
       return {
         success: true,
