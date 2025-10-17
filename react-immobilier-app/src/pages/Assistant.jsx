@@ -45,14 +45,14 @@ const Assistant = () => {
     const controller = new AbortController();
     setAbortController(controller);
 
-    // Ajouter un message bot vide qui sera rempli par le streaming
+    // Ajouter un message bot vide qui sera rempli par la réponse
     const botMessageId = Date.now() + 1;
     const botMessage = {
       id: botMessageId,
       type: 'bot',
-      content: '🤖 MonConseillerImmo réfléchit... Cela peut prendre 30 secondes pour les analyses complexes.',
+      content: '🤖 MonConseillerImmo réfléchit...',
       timestamp: new Date(),
-      streaming: true
+      streaming: false
     };
     setMessages(prev => [...prev, botMessage]);
 
@@ -81,6 +81,8 @@ const Assistant = () => {
             ? { ...msg, content: dustResponse.message, streaming: false }
             : msg
         ));
+        
+        console.log('🔄 Message mis à jour avec:', dustResponse.message);
       } else {
         // Message d'erreur avec logs complets
         console.log('❌ Erreur - Réponse complète:', dustResponse);
