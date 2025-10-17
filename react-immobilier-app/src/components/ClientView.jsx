@@ -13,7 +13,7 @@ const ClientView = () => {
           </div>
           
           <h1>
-            Trouvez Votre <span className="highlight">Propriété Idéale</span>
+            Trouvez Votre <span className="highlight">Propriété Idéale</span> avec Azura
           </h1>
           
           <p>
@@ -50,7 +50,7 @@ const ClientView = () => {
         {/* Assistant IA */}
         <div className="chat-container">
           <div className="chat-header">
-            <h3>Assistant IA Immobilier</h3>
+            <h3>Assistant IA Azura</h3>
             <p>Posez vos questions, obtenez des réponses instantanées</p>
           </div>
           
@@ -170,7 +170,7 @@ const ClientView = () => {
       {/* Section À Propos */}
       <section className="section" style={{ backgroundColor: 'oklch(0.95 0.02 80)' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-          <h2 className="section-title">À Propos d'AI Immobilier</h2>
+          <h2 className="section-title">À Propos d'Azura</h2>
           <p style={{ fontSize: '1.125rem', lineHeight: '1.7', marginBottom: '2rem', opacity: 0.8 }}>
             Nous révolutionnons l'immobilier avec l'intelligence artificielle. Notre plateforme connecte 
             propriétaires et acheteurs de manière intelligente, offrant une expérience personnalisée et 

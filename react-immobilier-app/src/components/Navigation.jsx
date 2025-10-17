@@ -7,7 +7,7 @@ const Navigation = ({ currentView, setCurrentView }) => {
       <div className="nav-container">
         <a href="/" className="logo">
           <Sparkles className="inline-block w-6 h-6 mr-2" />
-          AI Immobilier
+          Azura
         </a>
         
         <div className="nav-buttons">
