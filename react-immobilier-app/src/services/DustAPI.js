@@ -64,15 +64,22 @@ class DustService {
         agentId: this.agentId
       });
 
-      // Utiliser le proxy Netlify Functions pour contourner CORS
-      const dustResponse = await fetch('/.netlify/functions/dust-proxy', {
+      // Test direct avec timeout plus long (en attendant le déploiement des functions)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 secondes
+      
+      const dustResponse = await fetch(dustUrl, {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(dustPayload),
-        signal
+        signal: controller.signal,
+        mode: 'cors'
       });
+      
+      clearTimeout(timeoutId);
 
       console.log('📡 Réponse Dust:', {
         status: dustResponse.status,
