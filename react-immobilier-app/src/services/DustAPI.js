@@ -64,17 +64,15 @@ class DustService {
         agentId: this.agentId
       });
 
-      const dustResponse = await fetch(dustUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(dustPayload),
-        signal,
-        // Timeout de 60 secondes pour les requêtes longues
-        timeout: 60000
-      });
+            const dustResponse = await fetch(dustUrl, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${this.apiKey}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(dustPayload),
+              signal
+            });
 
       console.log('📡 Réponse Dust:', {
         status: dustResponse.status,

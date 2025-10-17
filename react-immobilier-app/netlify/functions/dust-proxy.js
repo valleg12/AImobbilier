@@ -2,6 +2,11 @@ exports.handler = async (event, context) => {
   // Augmenter le timeout à 30 secondes
   context.callbackWaitsForEmptyEventLoop = false;
   
+  // Timeout personnalisé pour les requêtes longues
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error('Request timeout')), 25000); // 25 secondes
+  });
+  
   // Vérifier que c'est une requête POST
   if (event.httpMethod !== 'POST') {
     return {
@@ -20,8 +25,8 @@ exports.handler = async (event, context) => {
     // Clé API Dust directement dans le code (version gratuite Netlify)
     const dustApiKey = 'sk-4a669dc7f20ff258b484bb4531960d73';
 
-    // Faire la requête vers l'API Dust
-    const response = await fetch(dustUrl, {
+    // Faire la requête vers l'API Dust avec timeout
+    const fetchPromise = fetch(dustUrl, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${dustApiKey}`,
@@ -29,6 +34,8 @@ exports.handler = async (event, context) => {
       },
       body: event.body
     });
+    
+    const response = await Promise.race([fetchPromise, timeoutPromise]);
 
     const data = await response.text();
     console.log('Dust API response status:', response.status);
