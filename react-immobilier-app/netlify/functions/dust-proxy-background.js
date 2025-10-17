@@ -17,11 +17,25 @@ exports.handler = async (event, context) => {
     
     console.log('Proxying request to:', dustUrl);
     
+    // Récupérer la clé API Dust depuis les variables d'environnement Netlify
+    const dustApiKey = process.env.DUST_API_KEY;
+    
+    if (!dustApiKey) {
+      return {
+        statusCode: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({ error: 'Dust API Key not configured' })
+      };
+    }
+
     // Faire la requête vers l'API Dust
     const response = await fetch(dustUrl, {
       method: 'POST',
       headers: {
-        'Authorization': event.headers.authorization,
+        'Authorization': `Bearer ${dustApiKey}`,
         'Content-Type': 'application/json'
       },
       body: event.body
