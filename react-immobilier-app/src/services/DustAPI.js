@@ -111,18 +111,33 @@ class DustService {
             }
       console.log('✅ Résultat Dust complet:', result);
 
-      // Test direct - afficher la réponse brute pour debug
+      // Extraire le contenu de l'agent depuis la structure Dust
       let responseMessage = "Réponse reçue de l'agent Dust";
       
-      if (result.message && result.message.content) {
-        responseMessage = result.message.content;
-      } else if (result.content) {
-        responseMessage = result.content;
-      } else if (result.text) {
-        responseMessage = result.text;
-      } else {
-        // Si on ne trouve rien, on affiche les premières lignes du JSON
-        responseMessage = JSON.stringify(result).substring(0, 500) + "...";
+      try {
+        // Structure Dust: result.conversation.content[1][0].content
+        if (result.conversation && result.conversation.content && result.conversation.content[1] && result.conversation.content[1][0]) {
+          const agentMessage = result.conversation.content[1][0];
+          if (agentMessage.content) {
+            responseMessage = agentMessage.content;
+          } else if (agentMessage.contents && agentMessage.contents[0] && agentMessage.contents[0].content) {
+            responseMessage = agentMessage.contents[0].content.value || agentMessage.contents[0].content;
+          }
+        }
+        // Fallback pour autres structures
+        else if (result.message && result.message.content) {
+          responseMessage = result.message.content;
+        } else if (result.content) {
+          responseMessage = result.content;
+        } else if (result.text) {
+          responseMessage = result.text;
+        } else {
+          // Si on ne trouve rien, on affiche les premières lignes du JSON
+          responseMessage = JSON.stringify(result).substring(0, 500) + "...";
+        }
+      } catch (parseError) {
+        console.error('❌ Erreur parsing réponse agent:', parseError);
+        responseMessage = "Erreur lors de l'extraction de la réponse de l'agent";
       }
       
       console.log('📤 Message final envoyé:', responseMessage);
