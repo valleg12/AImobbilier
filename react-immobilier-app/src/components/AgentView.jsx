@@ -49,58 +49,15 @@ const AgentView = () => {
 
         {/* Contenu des onglets */}
         {activeTab === 'assistant' && (
-          <div className="grid-2">
-            {/* Chat Assistant (2/3) */}
-            <div className="glass-card" style={{ gridColumn: 'span 2' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-                <MessageSquare className="w-5 h-5 text-primary" />
-                <h2 style={{ fontSize: '1.5rem', fontWeight: '600' }}>Assistant IA Immobilier</h2>
-              </div>
-              
-              {/* Statistiques rapides */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
-                <div className="stat-card">
-                  <div className="stat-number">24</div>
-                  <div className="stat-label">Propriétés Actives</div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-number">156</div>
-                  <div className="stat-label">Clients Actifs</div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-number">8</div>
-                  <div className="stat-label">Ventes ce Mois</div>
-                </div>
-              </div>
-
-              {/* Interface de chat */}
-              <div style={{ height: '500px', border: '1px solid oklch(0.85 0.02 70)', borderRadius: '12px', overflow: 'hidden' }}>
-                <Assistant />
-              </div>
+          <div className="glass-card">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
+              <MessageSquare className="w-5 h-5 text-primary" />
+              <h2 style={{ fontSize: '1.5rem', fontWeight: '600' }}>Assistant IA Azura</h2>
             </div>
 
-            {/* Actions Rapides (1/3) */}
-            <div className="glass-card">
-              <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1.5rem' }}>Actions Rapides</h3>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <button className="btn btn-outline" style={{ justifyContent: 'flex-start' }}>
-                  <Plus className="w-4 h-4" />
-                  Nouvelle Propriété
-                </button>
-                <button className="btn btn-outline" style={{ justifyContent: 'flex-start' }}>
-                  <Users className="w-4 h-4" />
-                  Ajouter Client
-                </button>
-                <button className="btn btn-outline" style={{ justifyContent: 'flex-start' }}>
-                  <TrendingUp className="w-4 h-4" />
-                  Rapport Ventes
-                </button>
-                <button className="btn btn-outline" style={{ justifyContent: 'flex-start' }}>
-                  <Mail className="w-4 h-4" />
-                  Envoyer Email
-                </button>
-              </div>
+            {/* Interface de chat - pleine largeur */}
+            <div style={{ height: '600px', border: '1px solid oklch(0.85 0.02 70)', borderRadius: '12px', overflow: 'hidden' }}>
+              <Assistant />
             </div>
           </div>
         )}
