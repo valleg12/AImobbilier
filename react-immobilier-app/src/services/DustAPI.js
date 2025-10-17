@@ -28,8 +28,8 @@ class DustService {
   async callChefOrchestre(userMessage, conversationId = null, signal = null) {
     console.log('🚀 Appel à l\'agent Dust chef d\'orchestre:', userMessage);
 
-    // Structure API Dust avec proxy Netlify (sans CORS)
-    const dustUrl = `/api/dust/v1/w/${this.workspaceId}/assistant/conversations`;
+    // Structure API Dust DIRECTE (comme le test qui fonctionne)
+    const dustUrl = `https://eu.dust.tt/api/v1/w/${this.workspaceId}/assistant/conversations`;
     
     try {
 
@@ -64,15 +64,14 @@ class DustService {
         agentId: this.agentId
       });
 
-      const dustResponse = await fetch(dustUrl, {
+      // Utiliser le proxy Netlify Functions pour contourner CORS
+      const dustResponse = await fetch('/.netlify/functions/dust-proxy', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(dustPayload),
         signal
-        // Pas de mode: 'cors' - on utilise l'API directe comme le test qui fonctionne
       });
 
       console.log('📡 Réponse Dust:', {
