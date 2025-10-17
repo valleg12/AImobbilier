@@ -65,6 +65,17 @@ const Assistant = () => {
       if (dustResponse.success) {
         // Finaliser le message avec la réponse complète
         console.log('✅ Succès - Message à afficher:', dustResponse.message);
+        console.log('🔍 Structure complète dustResponse:', dustResponse);
+        console.log('🔍 raw_result:', dustResponse.raw_result);
+        
+        // Vérifier si le message est différent du message utilisateur
+        if (dustResponse.message === currentMessage) {
+          console.error('❌ PROBLÈME: Le message agent est identique au message utilisateur!');
+          console.error('❌ Message utilisateur:', currentMessage);
+          console.error('❌ Message agent:', dustResponse.message);
+          console.error('❌ Raw result:', dustResponse.raw_result);
+        }
+        
         setMessages(prev => prev.map(msg => 
           msg.id === botMessageId 
             ? { ...msg, content: dustResponse.message, streaming: false }
